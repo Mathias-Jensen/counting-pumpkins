@@ -12,7 +12,7 @@ dst = cv2.GaussianBlur(image, (5, 5), 0)
 annotated_pumpkins = cv2.bitwise_and(dst,dst,mask=mask)
 cv2.imwrite('out/annotated_pumpkins.png',annotated_pumpkins)
 
-# Due statistics on the annotated image on color of pumpkins in RGB
+# Do statistics on the annotated image on color of pumpkins in RGB
 pumpkin_colors = []
 for i in range(annotated_pumpkins.shape[0]):
     for j in range(annotated_pumpkins.shape[1]):
@@ -39,13 +39,13 @@ cv2.imwrite('out/mask.png',mask)
 pumpkins = cv2.bitwise_and(image,image,mask=mask)
 cv2.imwrite('out/pumpkins.png',pumpkins)
 
-# Due the above but with the CieLAB color space
+# Do the above but with the CieLAB color space
 image_lab = cv2.cvtColor(image, cv2.COLOR_BGR2LAB)
 cv2.imwrite('out/image_cielab.png',image_lab)
 annotated_pumpkins_lab = cv2.cvtColor(annotated_pumpkins, cv2.COLOR_BGR2LAB)
 cv2.imwrite('out/annotated_pumpkins_cielab.png',annotated_pumpkins_lab)
 
-# Due statistics on the annotated image on color of pumpkins in CieLAB
+# Do statistics on the annotated image on color of pumpkins in CieLAB
 pumpkin_colors_lab = []
 for i in range(annotated_pumpkins_lab.shape[0]):
     for j in range(annotated_pumpkins_lab.shape[1]):
