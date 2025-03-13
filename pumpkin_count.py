@@ -1,6 +1,7 @@
 import numpy as np
 import cv2
 import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 
 image = cv2.imread('in/cropped.png')
 image_annotated = cv2.imread('in/cropped_and_anotated.png')
@@ -21,6 +22,22 @@ for i in range(annotated_pumpkins.shape[0]):
 pumpkin_colors = np.array(pumpkin_colors)
 #print('Pumpkin colors in RGB:')
 #print(pumpkin_colors)
+
+# Create a combined histogram for RGB channels
+histogram_b, _ = np.histogram(pumpkin_colors[:, 0], bins=256, range=(0, 256))
+plt.plot(histogram_b, color='b', label='Blue')
+histogram_g, _ = np.histogram(pumpkin_colors[:, 1], bins=256, range=(0, 256))
+plt.plot(histogram_g, color='g', label='Green')
+histogram_r, _ = np.histogram(pumpkin_colors[:, 2], bins=256, range=(0, 256))
+plt.plot(histogram_r, color='r', label='Red')
+plt.xlim([0, 256])
+plt.title('Combined Histogram for RGB channels')
+plt.xlabel('Pixel value')
+plt.ylabel('Frequency')
+plt.legend()
+plt.savefig('out/combined_histogram.png')
+plt.show()
+
 
 # Find mean, standard deviation, and covariance of each color channel of the pumpkins
 mean = np.mean(pumpkin_colors, axis=0)
@@ -55,16 +72,41 @@ pumpkin_colors_lab = np.array(pumpkin_colors_lab)
 print('Pumpkin colors in CieLAB:')
 print(pumpkin_colors_lab)
 
+# Create a 3D scatter plot for L*, a*, and b* channels in CieLAB
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
+ax.scatter(pumpkin_colors_lab[:, 0]*(100/255), pumpkin_colors_lab[:, 1]-128, pumpkin_colors_lab[:, 2]-128, c=pumpkin_colors_lab / 255.0, marker='o')
+ax.set_xlabel('L*')
+ax.set_ylabel('a*')
+ax.set_zlabel('b*')
+ax.set_title('3D Scatter Plot for L*, a*, and b* channels in CieLAB')
+ax.set_xlim([0, 100])
+ax.set_ylim([-127, 128])
+ax.set_zlim([-127, 128])
+plt.savefig('out/cielab_scatter.png')
+plt.show()
 # Find mean, standard deviation, and covariance of each color channel of the pumpkins in CieLAB
-mean_lab = np.mean(pumpkin_colors_lab, axis=0)
-std_lab = np.std(pumpkin_colors_lab, axis=0)
-cov_lab = np.cov(pumpkin_colors_lab.T)
+pumpkin_colors_lab_normal = [pumpkin_colors_lab[:, 0]*(100/255), pumpkin_colors_lab[:, 1]-128, pumpkin_colors_lab[:, 2]-128]
+pumpkin_colors_lab_normal = np.array(pumpkin_colors_lab_normal).T
+#print('Pumpkin colors in CieLAB normalized:')
+#np.set_printoptions(threshold=np.inf)
+#print(pumpkin_colors_lab_normal)
+
+# Get the mean, standard deviation and covariance in the actual ranges of CieLAB instead of 0 - 255
+mean_lab = np.mean(pumpkin_colors_lab_normal, axis=0)
+std_lab = np.std(pumpkin_colors_lab_normal, axis=0)
+cov_lab = np.cov(pumpkin_colors_lab_normal.T)
 print('Mean of pumpkin colors in CieLAB:')
 print(mean_lab)
 print('Standard deviation of pumpkin colors in CieLAB:')
 print(std_lab)
 print('Covariance of pumpkin colors in CieLAB:')
 print(cov_lab)
+
+# Get the mean, standard deviation and covariance in ranges of 0 - 255 to make sure the statistics are workin properly
+mean_lab = np.mean(pumpkin_colors_lab, axis=0)
+std_lab = np.std(pumpkin_colors_lab, axis=0)
+cov_lab = np.cov(pumpkin_colors_lab.T)
 
 # Using the statistical information find the pumpkins in the same color range on the original image in CieLAB
 mask_lab = cv2.inRange(image_lab, mean_lab - 2*std_lab, mean_lab + 2*std_lab)
